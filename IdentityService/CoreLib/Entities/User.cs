@@ -1,5 +1,4 @@
-namespace AuthService.Core.Entities;
-public enum UserRole { USER, ADMIN};
+namespace CoreLib.Entities;
 
 public class User
 {
@@ -7,7 +6,7 @@ public class User
     public string Email { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
     public string Name { get; set; } = null!;
-    public UserRole Role { get; set; } = UserRole.USER;
+    public Guid Role { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

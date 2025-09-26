@@ -1,4 +1,4 @@
-namespace AuthService.Core.Entities;
+namespace CoreLib.Entities;
 
 public class RefreshToken
 {

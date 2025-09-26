@@ -1,4 +1,4 @@
-namespace AuthService.Core.DTOs;
+namespace CoreLib.DTOs;
 
 public class RegisterRequest
 {
