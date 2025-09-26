@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Core", "AuthService.Core\AuthService.Core.csproj", "{2C7F9031-E5E8-4E91-8563-9A3EE58F6DC2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreLib", "CoreLib\CoreLib.csproj", "{2C7F9031-E5E8-4E91-8563-9A3EE58F6DC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Dal", "AuthService.Dal\AuthService.Dal.csproj", "{5F3A83AB-4269-486B-9D13-DD10BE4EA064}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityService.Dal", "IdentityService.Dal\IdentityService.Dal.csproj", "{5F3A83AB-4269-486B-9D13-DD10BE4EA064}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Logic", "AuthService.Logic\AuthService.Logic.csproj", "{420C3746-B9D9-48D7-A67D-96F966BB5B07}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityService.Logic", "IdentityService.Logic\IdentityService.Logic.csproj", "{420C3746-B9D9-48D7-A67D-96F966BB5B07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Api", "AuthService.Api\AuthService.Api.csproj", "{F187EB83-A1D4-478B-8224-10FF287F888A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityService.Api", "IdentityService.Api\IdentityService.Api.csproj", "{F187EB83-A1D4-478B-8224-10FF287F888A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

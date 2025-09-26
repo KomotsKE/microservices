@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AuthService.Core\AuthService.Core.csproj" />
-    <ProjectReference Include="..\AuthService.Logic\AuthService.Logic.csproj" />
+    <ProjectReference Include="..\CoreLib\CoreLib.csproj" />
+    <ProjectReference Include="..\IdentityService.Logic\IdentityService.Logic.csproj" />
   </ItemGroup>
 
 </Project>
