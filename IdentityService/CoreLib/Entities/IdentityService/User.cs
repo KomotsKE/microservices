@@ -6,7 +6,9 @@ public class User
     public string Email { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
     public string Name { get; set; } = null!;
-    public Guid Role { get; set; }
+    public Guid RoleId { get; set; }
+    public Role Role { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    public List<RefreshToken> RefreshTokens { get; set; } = new();
 }
