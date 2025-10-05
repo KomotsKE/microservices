@@ -1,3 +1,4 @@
+namespace CoreLib.DTOs;
 public class RoleDTO
 {
     public Guid Id { get; set; }
