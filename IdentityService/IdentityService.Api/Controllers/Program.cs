@@ -1,37 +1,43 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var keyString = jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key is missing in configuration");;
+var key = Encoding.UTF8.GetBytes(keyString);
 
-app.UseHttpsRedirection();
-
-var summaries = new[]
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(options =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        // указывает, будет ли валидироваться издатель при валидации токена
+        ValidateIssuer = true,
+        // будет ли валидироваться потребитель токена
+        ValidateAudience = true,
+        // будет ли валидироваться время существования
+        ValidateLifetime = true,
+        // валидация ключа безопасности
+        ValidateIssuerSigningKey = true,
+        // строка, представляющая издателя
+        ValidIssuer = jwtSettings["Issuer"],
+        // установка потребителя токена
+        ValidAudience = jwtSettings["Audience"],
+        // установка ключа безопасности
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+app.UseAuthentication();
 
 app.Run();
 
