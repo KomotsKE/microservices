@@ -1,7 +1,6 @@
-using System.Net.Http.Headers;
+using CoreLib.DTOs;
 using CoreLib.Entities;
 using CoreLib.Interfaces;
-using IdentityService.DAL.Repositories;
 
 namespace IdentityService.Logic;
 

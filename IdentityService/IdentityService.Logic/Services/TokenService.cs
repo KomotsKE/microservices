@@ -2,18 +2,21 @@ using CoreLib.Interfaces;
 using CoreLib.Entities;
 using CoreLib.DTOs;
 using System.Globalization;
+using CoreLib.Config;
 namespace IdentityService.Logic;
-//TODO убрать лишние методы
+
 public class TokenService : ITokenService
 {
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IJwtProvider _jwtProvider;
-
-    public TokenService(IRefreshTokenRepository refreshTokenRepository, IJwtProvider jwtProvider)
+    private readonly JwtSettings _jwtSettings;
+    private readonly UserRoleService _userRoleService;
+    public TokenService(IRefreshTokenRepository refreshTokenRepository, IJwtProvider jwtProvider, JwtSettings jwtSettings, UserRoleService userRoleService)
     {
         _refreshTokenRepository = refreshTokenRepository;
         _jwtProvider = jwtProvider;
-
+        _jwtSettings = jwtSettings;
+        _userRoleService = userRoleService;
     }
 
     public async Task<RefreshTokenDTO> CreateRefreshTokenAsync(Guid userId)
@@ -23,8 +26,7 @@ public class TokenService : ITokenService
             Id = Guid.NewGuid(),
             UserId = userId,
             Token = Guid.NewGuid().ToString(),
-            //TODO сделать конфиг для jwt
-            ExpiresAt = DateTime.UtcNow.AddDays(7)
+            ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenLifetimeDays)
         };
         await _refreshTokenRepository.AddAsync(token);
         return new RefreshTokenDTO
@@ -43,14 +45,15 @@ public class TokenService : ITokenService
         await _refreshTokenRepository.RevokeAsync(refreshToken);
     }
 
-    public async Task<AuthResponse> GenerateAccessAndRefreshToken(Guid userId, string userEmail)
+    public async Task<AuthResponse> GenerateAccessAndRefreshToken(Guid userId, string userEmail, List<string> roles)
     {
-        var accessToken = _jwtProvider.GenerateToken(userId, userEmail);
+        var accessToken = _jwtProvider.GenerateToken(userId, userEmail, roles);
         var refreshTokenDTO = await CreateRefreshTokenAsync(userId);
         return new AuthResponse
         {
             AccessToken = accessToken,
-            RefreshToken = refreshTokenDTO.Token
+            RefreshToken = refreshTokenDTO.Token,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenLifetimeMinutes)
         };
     }
     
@@ -65,17 +68,10 @@ public class TokenService : ITokenService
         var user = stored.User ??
                throw new Exception("User not found for this refresh token");
 
-        var newAccessToken = _jwtProvider.GenerateToken(user.Id, user.Email);
-
-        var newRefreshTokenDTO = await CreateRefreshTokenAsync(stored.UserId);
+        var rolesNames = await _userRoleService.GetUserRolesNamesAsync(user.Id); 
 
         await RevokeRefreshTokenAsync(stored.Token);
 
-        return new AuthResponse
-        {
-            AccessToken = newAccessToken,
-            RefreshToken = newRefreshTokenDTO.Token,
-            //TODO добавить через сколько истекает через конфиг 
-        };
+        return await GenerateAccessAndRefreshToken(user.Id, user.Email, rolesNames);
     }
 }

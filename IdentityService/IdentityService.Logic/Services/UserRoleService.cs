@@ -39,6 +39,8 @@ public class UserRoleService : IUserRoleService
         });
     }
 
+    public async Task<List<string>> GetUserRolesNamesAsync(Guid userId) => [.. (await GetUserRolesAsync(userId)).Select(r => r.Name)];
+
     public async Task RemoveRoleFromUserAsync(Guid roleId, Guid userId)
     {
         await _userRoleRepository.RemoveRoleFromUserAsync(userId, roleId);

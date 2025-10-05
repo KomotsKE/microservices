@@ -15,14 +15,17 @@ public class JwtProvider : IJwtProvider
         _jwtSettings = jwtSettings;
     }
     
-    public string GenerateToken(Guid userId, string email)
+    public string GenerateToken(Guid userId, string email, List<string> roles)
     {
         var key = Encoding.UTF8.GetBytes(_jwtSettings.Key);
-        var claims = new[]
+        var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, email)
+            new(JwtRegisteredClaimNames.Sub, userId.ToString()),
+            new(JwtRegisteredClaimNames.Email, email)
         };
+
+        foreach (var role in roles)
+            claims.Add(new Claim(ClaimTypes.Role, role));
 
         var token = new JwtSecurityToken(
             issuer: _jwtSettings.Issuer,
