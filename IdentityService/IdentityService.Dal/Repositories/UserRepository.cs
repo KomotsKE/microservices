@@ -13,11 +13,11 @@ public class UserRepository : Repository<User>, IUserRepository
     {
         _context = context;
     }   
-
     public async Task<User?> GetByEmailAsync(string email)
     {
         return await _context.Users
-            .Include(u => u.Role)
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
             .Include(u => u.RefreshTokens)
             .FirstOrDefaultAsync(u => u.Email == email);
     }
