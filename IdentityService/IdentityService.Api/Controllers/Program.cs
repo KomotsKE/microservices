@@ -8,19 +8,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 var app = builder.Build();
 
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var keyString = jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key is missing in configuration");;
-var key = Encoding.UTF8.GetBytes(keyString);
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()
     ?? throw new InvalidOperationException("Jwt configuration section is missing");
 
 if (string.IsNullOrWhiteSpace(jwtSettings.Key))
     throw new InvalidOperationException("Jwt:Key is missing in configuration");
 
-if (jwtSettings.AccessTokenExpirationMinutes <= 0)
+if (jwtSettings.AccessTokenLifetimeMinutes <= 0)
     throw new InvalidOperationException("Jwt:AccessTokenExpirationMinutes must be greater than zero");
 
-if (jwtSettings.RefreshTokenExpirationDays <= 0)
+if (jwtSettings.AccessTokenLifetimeMinutes <= 0)
     throw new InvalidOperationException("Jwt:RefreshTokenExpirationDays must be greater than zero");
 
 builder.Services.AddSingleton(jwtSettings);
@@ -42,11 +39,11 @@ builder.Services.AddAuthentication(options =>
         // валидация ключа безопасности
         ValidateIssuerSigningKey = true,
         // строка, представляющая издателя
-        ValidIssuer = jwtSettings["Issuer"],
+        ValidIssuer = jwtSettings.Issuer,
         // установка потребителя токена
-        ValidAudience = jwtSettings["Audience"],
+        ValidAudience = jwtSettings.Audience,
         // установка ключа безопасности
-        IssuerSigningKey = new SymmetricSecurityKey(key),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
         ClockSkew = TimeSpan.Zero
     };
 });
