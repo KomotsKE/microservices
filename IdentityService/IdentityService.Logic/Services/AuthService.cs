@@ -4,6 +4,7 @@ using CoreLib.Interfaces;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Logging;
 
 namespace IdentityService.Logic;
 
@@ -12,13 +13,14 @@ public class AuthService : IAuthService
     private readonly IUserService _userService;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
+    private readonly UserRoleService _userRoleService;
 
-    public AuthService(IUserService userService, ITokenService tokenService, IPasswordHasher passwordHasher)
+    public AuthService(IUserService userService, ITokenService tokenService, IPasswordHasher passwordHasher, UserRoleService userRoleService)
     {
         _passwordHasher = passwordHasher;
         _userService = userService;
         _tokenService = tokenService;
-        
+        _userRoleService = userRoleService;
     }
     public async Task<UserDto> RegisterAsync(RegisterRequest request)
     {
@@ -44,7 +46,8 @@ public class AuthService : IAuthService
         var user = await _userService.GetUserByEmailAsync(request.Email);
         if (user == null || !_passwordHasher.Verify(request.Password, user.PasswordHash))
             throw new Exception("Invalid credentials");
-        var responce = await _tokenService.GenerateAccessAndRefreshToken(user.Id, user.Email);
+        var rolesNames = await _userRoleService.GetUserRolesNamesAsync(user.Id);
+        var responce = await _tokenService.GenerateAccessAndRefreshToken(user.Id, user.Email, rolesNames);
         return responce;
     }   
 }
