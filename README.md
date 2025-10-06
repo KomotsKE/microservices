@@ -58,23 +58,23 @@
 
 ## REST API (Identity-Service)
 
-📘 API Endpoints
-| Контроллер	 | Метод |	Путь                          |  	Описание                           |
-|AuthController|	POST|	identityService/api/auth/register|	Регистрация нового пользователя|
-|AuthController|	POST|	identityService/api/auth/login|	Авторизация и получение токенов|
-|TokenController|	POST|	identityService/api/token/refresh|	Обновление Access Token по Refresh Token|
-|TokenController|	POST|	identityService/api/token/revoke/{token}|	Отзыв (аннулирование) refresh токена|
-|UserController|	GET|	identityService/api/user|	Получить список всех пользователей|
-|UserController|	GET|	identityService/api/user/{id}|	Получить данные пользователя по ID|
-|UserController|	POST|	identityService/api/user|	Создать нового пользователя|
-|UserController|	PUT|	identityService/api/user/{id}|	Обновить данные пользователя|
-|UserController|	DELETE|	identityService/api/user/{id}|	Удалить пользователя|
-|RoleController|	GET|	identityService/api/role|	Получить список всех ролей|
-|RoleController|	GET|	identityService/api/role/{id}|	Получить роль по ID|
-|RoleController|	POST|	identityService/api/role|	Создать новую роль|
-|RoleController|	PUT|	identityService/api/role/{id}|	Обновить данные роли|
-|RoleController|	DELETE|	identityService/api/role/{id}|	Удалить роль|
-|UserRoleController|	GET|	identityService/api/userrole/{userId}|	Получить список ролей пользователя|
-|UserRoleController|	POST|	identityService/api/userrole/{userId}/add/{roleId}|	Добавить роль пользователю|
-|UserRoleController|	DELETE|	identityService/api/userrole/{userId}/remove/{roleId}|	Удалить роль у пользователя|
-|UserRoleController|	PUT|	identityService/api/userrole/{userId}/update|	Обновить список ролей пользователя|
+| Контроллер         | Метод | Путь                                                     | Описание                                      |
+|--------------------|--------|----------------------------------------------------------|-----------------------------------------------|
+| **AuthController** | POST   | `identityService/api/auth/register`                      | Регистрация нового пользователя               |
+| **AuthController** | POST   | `identityService/api/auth/login`                         | Авторизация и получение токенов               |
+| **TokenController**| POST   | `identityService/api/token/refresh`                      | Обновление Access Token по Refresh Token      |
+| **TokenController**| POST   | `identityService/api/token/revoke/{token}`               | Отзыв (аннулирование) refresh токена          |
+| **UserController** | GET    | `identityService/api/user`                               | Получить список всех пользователей            |
+| **UserController** | GET    | `identityService/api/user/{id}`                          | Получить данные пользователя по ID            |
+| **UserController** | POST   | `identityService/api/user`                               | Создать нового пользователя                   |
+| **UserController** | PUT    | `identityService/api/user/{id}`                          | Обновить данные пользователя                  |
+| **UserController** | DELETE | `identityService/api/user/{id}`                          | Удалить пользователя                          |
+| **RoleController** | GET    | `identityService/api/role`                               | Получить список всех ролей                    |
+| **RoleController** | GET    | `identityService/api/role/{id}`                          | Получить роль по ID                           |
+| **RoleController** | POST   | `identityService/api/role`                               | Создать новую роль                            |
+| **RoleController** | PUT    | `identityService/api/role/{id}`                          | Обновить данные роли                          |
+| **RoleController** | DELETE | `identityService/api/role/{id}`                          | Удалить роль                                  |
+| **UserRoleController** | GET | `identityService/api/userrole/{userId}`                  | Получить список ролей пользователя            |
+| **UserRoleController** | POST| `identityService/api/userrole/{userId}/add/{roleId}`     | Добавить роль пользователю                    |
+| **UserRoleController** | DELETE | `identityService/api/userrole/{userId}/remove/{roleId}`| Удалить роль у пользователя                   |
+| **UserRoleController** | PUT | `identityService/api/userrole/{userId}/update`           | Обновить список ролей пользователя            |
