@@ -2,6 +2,6 @@ namespace CoreLib.Interfaces;
 
 public interface IJwtProvider
 {
-    public string GenerateToken(Guid userId, string email);
+    public string GenerateToken(Guid userId, string email, List<string> roles);
     
 }
