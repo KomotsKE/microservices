@@ -1,8 +1,9 @@
 using System.Text;
 using CoreLib.Config;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MyApp.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -49,5 +50,9 @@ builder.Services.AddAuthentication(options =>
 });
 
 app.UseAuthentication();
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 app.Run();

@@ -32,7 +32,7 @@ public class ApplicationDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Role>().HasData(
-            new Role { Id = Guid.NewGuid(), Name = "USER" },
-            new Role { Id = Guid.NewGuid(), Name = "ADMIN" });
+            new Role { Id = Guid.Parse("bca0c205-7e2c-4a2e-bdb1-d7e47e8c8d91"), Name = "USER" },
+            new Role { Id = Guid.Parse("bca0c205-7e2c-4a2e-bdb2-d7e47e8c8d92"), Name = "ADMIN" });
     }
 }
