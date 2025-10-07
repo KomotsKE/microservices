@@ -5,7 +5,7 @@ using MyApp.DAL;
 
 namespace IdentityService.DAL.Repositories;
 
-public class TokenRepository : Repository<RefreshToken>, IRefreshTokenRepository
+public class TokenRepository : Repository<RefreshToken>, ITokenRepository
 {
     private readonly ApplicationDbContext _context;
 
@@ -30,6 +30,7 @@ public class TokenRepository : Repository<RefreshToken>, IRefreshTokenRepository
     public async Task<RefreshToken?> GetByTokenAsync(string token)
     {
         return await _context.RefreshTokens
+        .Include(r => r.User)
         .FirstOrDefaultAsync(r => r.Token == token);
     }
 

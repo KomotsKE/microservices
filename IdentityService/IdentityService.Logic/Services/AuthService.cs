@@ -13,9 +13,9 @@ public class AuthService : IAuthService
     private readonly IUserService _userService;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
-    private readonly UserRoleService _userRoleService;
+    private readonly IUserRoleService _userRoleService;
 
-    public AuthService(IUserService userService, ITokenService tokenService, IPasswordHasher passwordHasher, UserRoleService userRoleService)
+    public AuthService(IUserService userService, ITokenService tokenService, IPasswordHasher passwordHasher, IUserRoleService userRoleService)
     {
         _passwordHasher = passwordHasher;
         _userService = userService;

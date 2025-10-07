@@ -7,11 +7,11 @@ namespace IdentityService.Logic;
 
 public class TokenService : ITokenService
 {
-    private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly ITokenRepository _refreshTokenRepository;
     private readonly IJwtProvider _jwtProvider;
     private readonly JwtSettings _jwtSettings;
-    private readonly UserRoleService _userRoleService;
-    public TokenService(IRefreshTokenRepository refreshTokenRepository, IJwtProvider jwtProvider, JwtSettings jwtSettings, UserRoleService userRoleService)
+    private readonly IUserRoleService _userRoleService;
+    public TokenService(ITokenRepository refreshTokenRepository, IJwtProvider jwtProvider, JwtSettings jwtSettings, IUserRoleService userRoleService)
     {
         _refreshTokenRepository = refreshTokenRepository;
         _jwtProvider = jwtProvider;

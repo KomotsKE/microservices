@@ -4,10 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MyApp.DAL;
+using CoreLib.Interfaces;
+using IdentityService.Logic;
+using IdentityService.DAL.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
-var app = builder.Build();
+
 
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()
     ?? throw new InvalidOperationException("Jwt configuration section is missing");
@@ -18,10 +21,26 @@ if (string.IsNullOrWhiteSpace(jwtSettings.Key))
 if (jwtSettings.AccessTokenLifetimeMinutes <= 0)
     throw new InvalidOperationException("Jwt:AccessTokenExpirationMinutes must be greater than zero");
 
-if (jwtSettings.AccessTokenLifetimeMinutes <= 0)
+if (jwtSettings.RefreshTokenLifetimeDays <= 0)
     throw new InvalidOperationException("Jwt:RefreshTokenExpirationDays must be greater than zero");
 
 builder.Services.AddSingleton(jwtSettings);
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddSingleton<IJwtProvider, JwtProvider>();
+builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(options =>
 {
@@ -48,11 +67,12 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
+builder.Services.AddControllers();
+
+var app = builder.Build();
 
 app.UseAuthentication();
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();
