@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace IdentityService.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("identityservice/api/[controller]")]
 [Authorize(Roles = "ADMIN")]
 public class RoleController : ControllerBase
 {

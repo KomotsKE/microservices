@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace IdentityService.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("identityservice/api/[controller]")]
 public class TokenController : ControllerBase
 {
     private readonly ITokenService _tokenService;
