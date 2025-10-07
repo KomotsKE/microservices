@@ -4,7 +4,7 @@ namespace CoreLib.Interfaces;
 /// <summary>
 /// Интерфейс для управления refresh-токенами.
 /// </summary>
-public interface IRefreshTokenRepository : IRepository<RefreshToken>
+public interface ITokenRepository : IRepository<RefreshToken>
 {
     /// <summary>Получить токен по его значению.</summary>
     Task<RefreshToken?> GetByTokenAsync(string token);
