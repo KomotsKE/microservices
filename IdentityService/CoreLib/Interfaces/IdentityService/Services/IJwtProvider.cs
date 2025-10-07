@@ -8,5 +8,5 @@ public interface IJwtProvider
     /// <summary>
     /// Генерация JWT-токена на основе данных пользователя и списка его ролей.
     /// </summary>
-    string GenerateToken(Guid userId, string email, params string[] roles);
+    string GenerateToken(Guid userId, string email, List<string> roles);
 }
