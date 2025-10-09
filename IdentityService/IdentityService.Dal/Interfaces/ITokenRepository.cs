@@ -1,3 +1,4 @@
+using CoreLib.Interfaces;
 using IdentityService.Dal.Entities;
 namespace IdentityService.Dal.Interfaces;
 

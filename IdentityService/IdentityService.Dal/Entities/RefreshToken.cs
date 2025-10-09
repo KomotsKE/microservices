@@ -5,13 +5,8 @@ namespace IdentityService.Dal.Entities;
 /// <summary>
 /// Представляет refresh-токен, используемый для обновления access-токена пользователя.
 /// </summary>
-public class RefreshToken
+public class RefreshToken : BaseEntity
 {
-    /// <summary>
-    /// Уникальный идентификатор refresh-токена.
-    /// </summary>
-    public Guid Id { get; set; }
-
     /// <summary>
     /// Идентификатор пользователя, которому принадлежит данный токен.
     /// </summary>

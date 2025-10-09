@@ -1,14 +1,12 @@
+using CoreLib.Entities;
+
 namespace IdentityService.Dal.Entities;
 
 /// <summary>
 /// Представляет пользователя сервиса
 /// </summary>
-public class User
+public class User : BaseEntity
 {
-    /// <summary>
-    /// Уникальный идентификатор
-    /// </summary>
-    public Guid Id { get; set; }
     /// <summary>
     /// Электронная почта
     /// </summary>

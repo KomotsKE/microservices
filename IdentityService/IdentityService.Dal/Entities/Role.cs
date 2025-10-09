@@ -1,14 +1,12 @@
+using CoreLib.Entities;
+
 namespace IdentityService.Dal.Entities;
 
 /// <summary>
 /// Представляет роль пользователя, определяющий его возможности
 /// </summary>
-public class Role
+public class Role : BaseEntity
 {
-    /// <summary>
-    /// Уникальный идентификатор
-    /// </summary>
-    public Guid Id { get; set; }
     /// <summary>
     /// Строка с именем
     /// </summary>
