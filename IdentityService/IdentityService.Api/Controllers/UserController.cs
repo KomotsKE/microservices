@@ -1,5 +1,5 @@
-using CoreLib.DTOs;
-using CoreLib.Interfaces;
+using IdentityService.Logic.DTOs;
+using IdentityService.Logic.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,8 +1,9 @@
-using CoreLib.DTOs;
-using CoreLib.Entities;
-using CoreLib.Interfaces;
+using IdentityService.Logic.DTOs;
+using IdentityService.Logic.Interfaces;
+using IdentityService.Dal.Interfaces;
+using IdentityService.Dal.Entities;
 
-namespace IdentityService.Logic;
+namespace IdentityService.Logic.Services;
 
 public class RoleService : IRoleService
 {

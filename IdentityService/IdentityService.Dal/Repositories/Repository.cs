@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using CoreLib.Interfaces;
-using MyApp.DAL;
-
-namespace IdentityService.DAL.Repositories;
+using IdentityService.Dal.Interfaces;
+using IdentityService.Dal.DBContext;
+namespace IdentityService.Dal.Repositories;
 
 public class Repository<T> : IRepository<T> where T : class
 {

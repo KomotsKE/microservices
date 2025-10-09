@@ -1,14 +1,14 @@
-using Azure.Core;
-using CoreLib.DTOs;
-using CoreLib.Entities;
-using CoreLib.Interfaces;
+using IdentityService.Logic.DTOs;
+using IdentityService.Dal.Entities;
+using IdentityService.Dal.Interfaces;
+using IdentityService.Logic.Interfaces;
 
-namespace IdentityService.Logic;
+namespace IdentityService.Logic.Services;
 
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
-
+ 
     public UserService(IUserRepository userRepository)
     {
         _userRepository = userRepository;

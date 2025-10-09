@@ -1,10 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using CoreLib.Config;
-using CoreLib.Interfaces;
-using Microsoft.Extensions.Configuration;
+using IdentityService.Logic.Config;
+using IdentityService.Logic.Interfaces;
 using Microsoft.IdentityModel.Tokens;
+
+namespace IdentityService.Logic.Services;
 
 public class JwtProvider : IJwtProvider
 {

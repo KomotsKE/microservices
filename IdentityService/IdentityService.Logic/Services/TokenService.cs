@@ -1,9 +1,10 @@
-using CoreLib.Interfaces;
-using CoreLib.Entities;
-using CoreLib.DTOs;
-using System.Globalization;
-using CoreLib.Config;
-namespace IdentityService.Logic;
+using IdentityService.Dal.Interfaces;
+using IdentityService.Logic.Interfaces;
+using IdentityService.Dal.Entities;
+using IdentityService.Logic.DTOs;
+using IdentityService.Logic.Config;
+
+namespace IdentityService.Logic.Services;
 
 public class TokenService : ITokenService
 {

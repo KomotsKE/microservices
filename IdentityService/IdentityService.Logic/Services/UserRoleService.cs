@@ -1,9 +1,8 @@
-using CoreLib.DTOs;
-using CoreLib.Entities;
-using CoreLib.Interfaces;
-using Microsoft.Identity.Client;
-using Microsoft.VisualBasic;
-namespace IdentityService.Logic;
+using IdentityService.Logic.DTOs;
+using IdentityService.Dal.Interfaces;
+using IdentityService.Logic.Interfaces;
+
+namespace IdentityService.Logic.Services;
 
 public class UserRoleService : IUserRoleService
 {

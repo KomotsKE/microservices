@@ -1,16 +1,16 @@
 using System.Text;
-using CoreLib.Config;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using MyApp.DAL;
-using CoreLib.Interfaces;
-using IdentityService.Logic;
-using IdentityService.DAL.Repositories;
+using IdentityService.Dal.DBContext;
+using IdentityService.Logic.Interfaces;
+using IdentityService.Logic.Services;
+using IdentityService.Dal.Interfaces;
+using IdentityService.Dal.Repositories;
+using IdentityService.Logic.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
-
 
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()
     ?? throw new InvalidOperationException("Jwt configuration section is missing");

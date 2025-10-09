@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using CoreLib.Entities;
+using IdentityService.Dal.Entities;
 
-namespace MyApp.DAL;
+namespace IdentityService.Dal.DBContext;
 
 public class ApplicationDbContext : DbContext
 {

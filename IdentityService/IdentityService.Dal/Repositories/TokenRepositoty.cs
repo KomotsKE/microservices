@@ -1,9 +1,10 @@
-using CoreLib.Entities;
-using CoreLib.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using MyApp.DAL;
 
-namespace IdentityService.DAL.Repositories;
+using IdentityService.Dal.Entities;
+using IdentityService.Dal.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using IdentityService.Dal.DBContext;
+
+namespace IdentityService.Dal.Repositories;
 
 public class TokenRepository : Repository<RefreshToken>, ITokenRepository
 {

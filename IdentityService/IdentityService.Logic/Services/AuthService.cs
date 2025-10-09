@@ -1,12 +1,7 @@
-﻿using CoreLib.DTOs;
-using CoreLib.Entities;
-using CoreLib.Interfaces;
-using System.Security.Cryptography;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using System.Runtime.InteropServices;
-using Microsoft.Extensions.Logging;
+﻿using IdentityService.Logic.DTOs;
+using IdentityService.Logic.Interfaces;
 
-namespace IdentityService.Logic;
+namespace IdentityService.Logic.Services;
 
 public class AuthService : IAuthService
 {

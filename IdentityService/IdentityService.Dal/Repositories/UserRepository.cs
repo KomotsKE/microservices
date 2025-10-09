@@ -1,9 +1,9 @@
-﻿using CoreLib.Entities;
-using CoreLib.Interfaces;
+﻿using IdentityService.Dal.Entities;
+using IdentityService.Dal.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using MyApp.DAL;
+using IdentityService.Dal.DBContext;
 
-namespace IdentityService.DAL.Repositories;
+namespace IdentityService.Dal.Repositories;
 
 public class UserRepository : Repository<User>, IUserRepository
 {

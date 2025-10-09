@@ -1,6 +1,9 @@
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using CoreLib.Interfaces;
+using IdentityService.Logic.Interfaces;
+
+namespace IdentityService.Logic.Services;
+
 public class PasswordHasher : IPasswordHasher
 {
     public string Hash(string password)
