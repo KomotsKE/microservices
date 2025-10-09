@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\CoreLib\CoreLib.csproj" />
+    <ProjectReference Include="..\..\CoreLib\CoreLib.csproj" />
     <ProjectReference Include="..\IdentityService.Dal\IdentityService.Dal.csproj" />
   </ItemGroup>
 
