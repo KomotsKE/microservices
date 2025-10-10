@@ -107,6 +107,15 @@
 | RoleId | Guid | Идентификатор роли |
 | Role | Role | Ссылка на роль |
 
+# Order Service
+
+| Сущность | Поля | Описание |
+|-----------|-------|-----------|
+| **Product** | `Id: Guid`<br>`Name: string`<br>`Description: string`<br>`Price: decimal`<br>`Stock: int` | Товар, доступный для покупки |
+| **Order** | `Id: Guid`<br>`UserId: Guid`<br>`CreatedAt: DateTime`<br>`TotalAmount: decimal` | Заказ, оформленный пользователем |
+| **OrderItem** | `Id: Guid`<br>`OrderId: Guid`<br>`ProductId: Guid`<br>`Quantity: int`<br>`Price: decimal` | Позиция внутри заказа |
+| **User** | `Id: Guid`<br>`Email: string`<br>`PasswordHash: string` | Покупатель / пользователь системы |
+
 ---
 
 ## REST API (Identity-Service)
@@ -131,3 +140,39 @@
 | **UserRoleController** | POST| `identityService/api/userrole/{userId}/add/{roleId}`     | Добавить роль пользователю                    |
 | **UserRoleController** | DELETE | `identityService/api/userrole/{userId}/remove/{roleId}`| Удалить роль у пользователя                   |
 | **UserRoleController** | PUT | `identityService/api/userrole/{userId}/update`           | Обновить список ролей пользователя            |
+
+
+## REST API — OrderService
+
+### CategoryController (`orderservice/api/category`)
+
+| Метод | Endpoint | Тело запроса | Ответ | Описание |
+|--------|-----------|---------------|---------|-----------|
+| **GET** | `/orderservice/api/category` | — | `[CategoryDto]` | Получить список всех категорий |
+| **GET** | `/orderservice/api/category/{id}` | — | `CategoryDto` | Получить категорию по ID |
+| **POST** | `/orderservice/api/category` | `{ name, description }` | `{ categoryId }` | Создать новую категорию |
+| **PUT** | `/orderservice/api/category` | `{ id, name, description }` | — | Обновить категорию |
+| **DELETE** | `/orderservice/api/category/{id}` | — | — | Удалить категорию |
+
+
+---
+
+### ProductController (`orderservice/api/product`)
+
+| Метод | Endpoint | Тело запроса | Ответ | Описание |
+|--------|-----------|---------------|---------|-----------|
+| **GET** | `/orderservice/api/product` | — | `[ProductDto]` | Получить список всех товаров |
+| **GET** | `/orderservice/api/product/{id}` | — | `ProductDto` | Получить товар по ID |
+| **GET** | `/orderservice/api/product/category/{categoryId}` | — | `[ProductDto]` | Получить товары по категории |
+
+
+---
+
+### OrderController (`orderservice/api/order`)
+
+| Метод | Endpoint | Тело запроса | Ответ | Описание |
+|--------|-----------|---------------|---------|-----------|
+| **POST** | `/orderservice/api/order` | `?userId={guid}&productId={guid}&quantity={int}` | `{ orderId }` | Создать заказ |
+| **GET** | `/orderservice/api/order/{id}` | — | `OrderDto` | Получить заказ по ID |
+| **GET** | `/orderservice/api/order/user/{userId}` | — | `[OrderDto]` | Получить заказы пользователя |
+| **PATCH** | `/orderservice/api/order/{id}/status` | `?status={OrderStatus}` | — | Обновить статус заказа |
