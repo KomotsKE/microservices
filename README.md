@@ -111,10 +111,9 @@
 
 | Сущность | Поля | Описание |
 |-----------|-------|-----------|
-| **Product** | `Id: Guid`<br>`Name: string`<br>`Description: string`<br>`Price: decimal`<br>`Stock: int` | Товар, доступный для покупки |
-| **Order** | `Id: Guid`<br>`UserId: Guid`<br>`CreatedAt: DateTime`<br>`TotalAmount: decimal` | Заказ, оформленный пользователем |
-| **OrderItem** | `Id: Guid`<br>`OrderId: Guid`<br>`ProductId: Guid`<br>`Quantity: int`<br>`Price: decimal` | Позиция внутри заказа |
-| **User** | `Id: Guid`<br>`Email: string`<br>`PasswordHash: string` | Покупатель / пользователь системы |
+| **Category** | `Id: Guid`<br>`Name: string`<br>`Description: string` | Категория товара |
+| **Product** | `Id: Guid`<br>`Name: string`<br>`Description: string`<br>`Price: decimal`<br>`Stock: int`<br>`CategoryId: Guid` | Товар, принадлежащий категории |
+| **Order** | `Id: Guid`<br>`UserId: Guid`<br>`ProductId: Guid`<br>`Quantity: int`<br>`TotalAmount: decimal`<br>`Status: OrderStatus`<br>`CreatedAt: DateTime` | Заказ, оформленный пользователем |
 
 ---
 
