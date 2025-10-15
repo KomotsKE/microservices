@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Application.Interfaces;
-using OrderService.Domain.Enums;
+using OrderService.Application.DTOs;
 
 namespace Marketplace.API.Controllers
 {
@@ -37,7 +37,7 @@ namespace Marketplace.API.Controllers
         }
 
         [HttpPatch("{id:guid}/status")]
-        public async Task<IActionResult> UpdateStatus(Guid id, OrderStatus status)
+        public async Task<IActionResult> UpdateStatus(Guid id, OrderStatusDto status)
         {
             await _orderService.UpdateOrderStatusAsync(id, status);
             return NoContent();

@@ -63,11 +63,11 @@ public class OrderService: IOrderService
         });
     }
 
-    public async Task UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus)
+    public async Task UpdateOrderStatusAsync(Guid orderId, OrderStatusDto newStatus)
     {
         var order = await _orderRepo.GetByIdAsync(orderId);
         if (order == null) throw new Exception("Order not found");
-        order.Status = newStatus;
+        order.Status = (OrderStatus)newStatus;
         await _orderRepo.UpdateAsync(order);
     }
 

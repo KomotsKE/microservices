@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\orderservice.infrastructure\OrderService.Infrastructure.csproj" />
     <ProjectReference Include="..\Orderservice.application\OrderService.Application.csproj" />
+    <ProjectReference Include="..\orderservice.infrastructure\OrderService.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

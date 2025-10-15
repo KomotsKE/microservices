@@ -3,7 +3,6 @@ using OrderService.Domain.Entities;
 using OrderService.Application.DTOs;
 using OrderService.Application.Interfaces;
 namespace OrderService.Application.Services;
-
 public class ProductService : IProductService
 {
      private readonly IRepository<Product> _productRepo;
