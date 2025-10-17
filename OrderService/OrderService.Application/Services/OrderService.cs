@@ -3,15 +3,16 @@ using OrderService.Domain.Entities;
 using OrderService.Application.DTOs;
 using OrderService.Domain.Enums;
 using OrderService.Application.Interfaces;
+using OrderService.Domain.Interfaces;
 
 namespace OrderService.Application.Services;
 
 public class OrderService: IOrderService
 {
-    private readonly IRepository<Order> _orderRepo;
-    private readonly IRepository<Product> _productRepo;
+    private readonly IOrderRepository _orderRepo;
+    private readonly IProductRepository _productRepo;
 
-    public OrderService(IRepository<Order> orderRepo, IRepository<Product> productRepo)
+    public OrderService(IOrderRepository orderRepo, IProductRepository productRepo)
     {
         _orderRepo = orderRepo;
         _productRepo = productRepo;
@@ -32,13 +33,13 @@ public class OrderService: IOrderService
             UserId = userId,
             ProductId = productId,
             Quantity = quantity,
-            Price = product.Price * quantity,
+            TotalPrice = product.Price * quantity,
             Status = OrderStatus.Created,
             CreatedAt = DateTime.UtcNow
         };
         await _orderRepo.AddAsync(order);
 
-        return MapToDto(order, product.Name);
+        return MapToDto(order);
     }
 
     public async Task<OrderDto?> GetOrderByIdAsync(Guid orderId)
@@ -46,21 +47,19 @@ public class OrderService: IOrderService
         var order = await _orderRepo.GetByIdAsync(orderId);
         if (order == null) return null;
 
-        var product = await _productRepo.GetByIdAsync(order.ProductId);
-        return MapToDto(order, product?.Name ?? "Unknown");
+        return MapToDto(order);
     }
 
-    public async Task<IEnumerable<OrderDto>> GetOrdersByUserAsync(Guid userId)
+    public async Task<IEnumerable<OrderDto>> GetOrdersByStatusAsync(OrderStatusDto orderStatusDto)
     {
-        var orders = await _orderRepo.GetAllAsync();
-        var userOrders = orders.Where(o => o.UserId == userId).ToList();
-        var productIds = userOrders.Select(o => o.ProductId).Distinct().ToList();
-        var products = await _productRepo.GetAllAsync();
-        return userOrders.Select(o =>
-        {
-            var p = products.FirstOrDefault(x => x.Id == o.ProductId);
-            return MapToDto(o, p?.Name ?? "Unknown");
-        });
+        var orders = await _orderRepo.GetOrdersByStatusAsync((OrderStatus)orderStatusDto);
+        return orders.Select(o => MapToDto(o));
+    }
+
+    public async Task<IEnumerable<OrderDto>> GetOrdersByUserIdAsync(Guid userId)
+    {
+        var orders = await _orderRepo.GetOrdersByUserIdAsync(userId);
+        return orders.Select(o => MapToDto(o));
     }
 
     public async Task UpdateOrderStatusAsync(Guid orderId, OrderStatusDto newStatus)
@@ -71,14 +70,14 @@ public class OrderService: IOrderService
         await _orderRepo.UpdateAsync(order);
     }
 
-    private OrderDto MapToDto(Order order, string productName)
+    private OrderDto MapToDto(Order order)
     {
         return new OrderDto(
             order.Id,
             order.UserId,
             order.ProductId,
             order.Quantity,
-            order.Price,
+            order.TotalPrice,
             order.Status.ToString(),
             order.CreatedAt
         );

@@ -5,6 +5,7 @@ public interface IOrderService
 {
     Task<OrderDto> CreateOrderAsync(Guid userId, Guid productId, int quantity);
     Task<OrderDto?> GetOrderByIdAsync(Guid orderId);
-    Task<IEnumerable<OrderDto>> GetOrdersByUserAsync(Guid userId);
+    Task<IEnumerable<OrderDto>> GetOrdersByUserIdAsync(Guid userId);
+    Task<IEnumerable<OrderDto>> GetOrdersByStatusAsync(OrderStatusDto orderStatusDto);
     Task UpdateOrderStatusAsync(Guid orderId, OrderStatusDto newStatus);
 }

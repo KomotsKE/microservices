@@ -2,42 +2,43 @@ using CoreLib.Interfaces;
 using OrderService.Domain.Entities;
 using OrderService.Application.DTOs;
 using OrderService.Application.Interfaces;
+using OrderService.Domain.Interfaces;
 namespace OrderService.Application.Services;
 public class ProductService : IProductService
 {
-     private readonly IRepository<Product> _productRepo;
-    private readonly IRepository<Category> _categoryRepo;
+    private readonly IProductRepository _productRepo;
 
-    public ProductService(IRepository<Product> productRepo, IRepository<Category> categoryRepo)
+    public ProductService(IProductRepository productRepo)
     {
         _productRepo = productRepo;
-        _categoryRepo = categoryRepo;
     }
 
     public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
     {
         var products = await _productRepo.GetAllAsync();
-        var categories = await _categoryRepo.GetAllAsync();
-        return products.Select(p =>
-        {
-            var c = categories.FirstOrDefault(cat => cat.Id == p.CategoryId);
-            return new ProductDto(p.Id, p.Name, p.Description, p.Price, p.Stock, c?.Name ?? "Unknown");
-        });
+        return products.Select(p => MapToDto(p));
     }
 
-    public async Task<ProductDto?> GetProductByIdAsync(Guid productId)
+    public async Task<ProductDto> GetProductByIdAsync(Guid productId)
     {
-        var p = await _productRepo.GetByIdAsync(productId);
-        if (p == null) return null;
-        var c = await _categoryRepo.GetByIdAsync(p.CategoryId);
-        return new ProductDto(p.Id, p.Name, p.Description, p.Price, p.Stock, c?.Name ?? "Unknown");
+        var product = await _productRepo.GetByIdAsync(productId) ?? throw new Exception("Product not found");
+        return MapToDto(product);
     }
 
-    public async Task<IEnumerable<ProductDto>> GetProductsByCategoryAsync(Guid categoryId)
+    public async Task<ProductDto> GetProductByNameAsync(string productName)
     {
-        var products = await _productRepo.GetAllAsync();
-        var filtered = products.Where(p => p.CategoryId == categoryId);
-        var category = await _categoryRepo.GetByIdAsync(categoryId);
-        return filtered.Select(p => new ProductDto(p.Id, p.Name, p.Description, p.Price, p.Stock, category?.Name ?? "Unknown"));
+        var product = await _productRepo.GetByNameAsync(productName) ?? throw new Exception("Product not found");
+        return MapToDto(product);
+    }
+
+    public async Task<IEnumerable<ProductDto>> GetProductsByCategoryAsync(string categoryName)
+    {
+        var products = await _productRepo.GetByCategoryAsync(categoryName);
+        return products.Select(p => MapToDto(p));
+    }
+
+    private ProductDto MapToDto(Product product)
+    {
+        return new ProductDto(product.Id, product.Name, product.Description, product.Price, product.Stock, product.CategoryId);
     }
 }
