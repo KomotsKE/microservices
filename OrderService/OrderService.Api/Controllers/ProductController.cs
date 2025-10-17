@@ -28,10 +28,17 @@ namespace Marketplace.API.Controllers
             return product == null ? NotFound() : Ok(product);
         }
 
-        [HttpGet("category/{categoryId:guid}")]
-        public async Task<IActionResult> GetByCategory(Guid categoryId)
+        [HttpGet("category/{category}")]
+        public async Task<IActionResult> GetByCategory(string category)
         {
-            var products = await _productService.GetProductsByCategoryAsync(categoryId);
+            var products = await _productService.GetProductsByCategoryAsync(category);
+            return Ok(products);
+        }
+
+        [HttpGet("{name}")]
+        public async Task<IActionResult> GetByName(string name)
+        {
+            var products = await _productService.GetProductByNameAsync(name);
             return Ok(products);
         }
     }

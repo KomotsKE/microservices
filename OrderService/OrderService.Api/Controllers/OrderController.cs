@@ -30,9 +30,16 @@ namespace Marketplace.API.Controllers
         }
 
         [HttpGet("user/{userId:guid}")]
-        public async Task<IActionResult> GetOrdersByUser(Guid userId)
+        public async Task<IActionResult> GetOrdersByUserId(Guid userId)
         {
-            var orders = await _orderService.GetOrdersByUserAsync(userId);
+            var orders = await _orderService.GetOrdersByUserIdAsync(userId);
+            return Ok(orders);
+        }
+
+        [HttpGet("user/status")]
+        public async Task<IActionResult> GetOrdersByStatus(OrderStatusDto status)
+        {
+            var orders = await _orderService.GetOrdersByStatusAsync(status);
             return Ok(orders);
         }
 
