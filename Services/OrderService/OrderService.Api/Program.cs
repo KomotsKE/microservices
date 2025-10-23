@@ -2,6 +2,7 @@ using DotNetEnv;
 using OrderService.Application.Services;
 using OrderService.Application.Interfaces;
 using OrderService.Infrastructure;
+using CoreLib.HttpLogic;
 
 
 Env.Load();

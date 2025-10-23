@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\CoreLib\CoreLib.csproj" />
     <ProjectReference Include="..\IdentityService.Logic\IdentityService.Logic.csproj" />
   </ItemGroup>
 
