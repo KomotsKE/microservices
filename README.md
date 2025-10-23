@@ -162,7 +162,7 @@
 |--------|-----------|---------------|---------|-----------|
 | **GET** | `/orderservice/api/product` | — | `[ProductDto]` | Получить список всех товаров |
 | **GET** | `/orderservice/api/product/{id}` | — | `ProductDto` | Получить товар по ID |
-| **GET** | `/orderservice/api/product/category/{categoryId}` | — | `[ProductDto]` | Получить товары по категории |
+| **GET** | `/orderservice/api/product/category/{category}` | — | `[ProductDto]` | Получить товары по категории |
 
 
 ---
@@ -175,3 +175,5 @@
 | **GET** | `/orderservice/api/order/{id}` | — | `OrderDto` | Получить заказ по ID |
 | **GET** | `/orderservice/api/order/user/{userId}` | — | `[OrderDto]` | Получить заказы пользователя |
 | **PATCH** | `/orderservice/api/order/{id}/status` | `?status={OrderStatus}` | — | Обновить статус заказа |
+
+#TODO сделать новую документацию для orderservice

@@ -12,6 +12,7 @@ builder.Services.AddScoped<IOrderService, OrderService.Application.Services.Orde
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddControllers();
+builder.Services.AddHttpRequestService();
 
 var app = builder.Build();
 app.MapControllers();
