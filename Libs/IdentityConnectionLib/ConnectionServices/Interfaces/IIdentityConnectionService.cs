@@ -1,6 +1,8 @@
+using IdentityConnectionLib.ConnectionServices.DtoMidels.CheckUserExists;
+
 namespace IdentityConnectionLib.ConnectionServices.interfaces;
 
 public interface IIdentityConnectionService
 {
-    Task<bool> CheckUserExistsAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<CheckUserExistIdentityServiceResponce> CheckUserExistsAsync(CheckUserExistIdentityServiceRequest request);
 }

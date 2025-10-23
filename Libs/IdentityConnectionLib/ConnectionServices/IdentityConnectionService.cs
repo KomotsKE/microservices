@@ -1,7 +1,11 @@
+
+using CoreLib.HttpLogic.Services;
 using CoreLib.HttpServiceV2.Services.Interfaces;
+using IdentityConnectionLib.ConnectionServices.DtoMidels.CheckUserExists;
 using IdentityConnectionLib.ConnectionServices.interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 namespace IdentityConnectionLib.ConnectionService;
 
 public class IdentityConnectionService : IIdentityConnectionService
@@ -10,18 +14,36 @@ public class IdentityConnectionService : IIdentityConnectionService
 
     public IdentityConnectionService(IConfiguration configuration, IServiceProvider serviceProvider)
     {
-        if (configuration.GetSection("dsgf").Value == "http")
+        if (configuration.GetSection("IdentityService:Transport").Value == "http")
         {
             _httpClientFactory = serviceProvider.GetRequiredService<IHttpRequestService>();
         }
         else
         {
-            // RPC по rabbit
+            throw new NotImplementedException("RPC transport not implemented yet");
         }
     }
 
-    public Task<bool> CheckUserExistsAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<CheckUserExistIdentityServiceResponce> CheckUserExistsAsync(CheckUserExistIdentityServiceRequest request)
     {
-        throw new NotImplementedException();
+        var connectionData = new HttpConnectionData
+        {
+            ClientName = "identity",
+            Timeout = TimeSpan.FromSeconds(10)
+        };
+
+        var requestData = new HttpRequestData
+        {
+            Method = HttpMethod.Get,
+            Uri = new Uri($"identityservice/api/user/{request.UserId}/exists", UriKind.Relative)
+        };
+
+        var response = await _httpClientFactory.SendRequestAsync<CheckUserExistIdentityServiceResponce>(
+            requestData, connectionData);
+
+        if (!response.IsSuccessStatusCode)
+            return new CheckUserExistIdentityServiceResponce { IsExist = false };
+
+        return response.Body;
     }
 }

@@ -56,7 +56,7 @@ public record HttpRequestData
     /// <summary>
     /// Тело метода
     /// </summary>
-    public required object Body { get; set; }
+    public object? Body { get; set; }
 
     /// <summary>
     /// content-type, указываемый при запросе
