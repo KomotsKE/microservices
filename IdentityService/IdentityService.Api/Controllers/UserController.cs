@@ -40,6 +40,14 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
+    [AllowAnonymous]
+    [HttpGet("{id:guid}/exists")]
+    public async Task<IActionResult> CheckUserExists(Guid id)
+    {
+        var user = await _userService.GetUserByIdAsync(id);
+        return Ok(new { isExist = user != null });
+    }
+
     /// <summary>
     /// Создать нового пользователя
     /// </summary>
