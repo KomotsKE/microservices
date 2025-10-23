@@ -1,9 +1,11 @@
-using CoreLib.Interfaces;
+
 using OrderService.Domain.Entities;
 using OrderService.Application.DTOs;
 using OrderService.Domain.Enums;
 using OrderService.Application.Interfaces;
 using OrderService.Domain.Interfaces;
+using IdentityConnectionLib.ConnectionServices.DtoMidels.CheckUserExists;
+using IdentityConnectionLib.ConnectionServices.interfaces;
 
 namespace OrderService.Application.Services;
 
@@ -11,15 +13,22 @@ public class OrderService: IOrderService
 {
     private readonly IOrderRepository _orderRepo;
     private readonly IProductRepository _productRepo;
+    private readonly IIdentityConnectionService _identityService;
 
-    public OrderService(IOrderRepository orderRepo, IProductRepository productRepo)
+    public OrderService(IOrderRepository orderRepo, IProductRepository productRepo, IIdentityConnectionService identityService)
     {
         _orderRepo = orderRepo;
         _productRepo = productRepo;
+        _identityService = identityService;
     }
 
     public async Task<OrderDto> CreateOrderAsync(Guid userId, Guid productId, int quantity)
     {
+        var checkUserDto = new CheckUserExistIdentityServiceRequest { UserId = userId };
+        var userExists = await _identityService.CheckUserExistsAsync(checkUserDto);
+        if (!userExists.IsExist)
+            throw new Exception("User not found");
+            
         var product = await _productRepo.GetByIdAsync(productId);
         if (product == null) throw new Exception("Product not found");
         if (product.Stock < quantity) throw new Exception("Not enough stock");

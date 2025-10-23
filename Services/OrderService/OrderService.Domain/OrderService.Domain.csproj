@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../../libs/CoreLib/CoreLib.csproj" />
+    <ProjectReference Include="../../../libs/IdentityConnectionLib/IdentityConnectionLib.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
