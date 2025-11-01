@@ -3,6 +3,8 @@ using OrderService.Application.Services;
 using OrderService.Application.Interfaces;
 using OrderService.Infrastructure;
 using CoreLib.HttpLogic;
+using OrderService.Api.Consumers;
+using MassTransit;
 
 
 Env.Load();
@@ -14,6 +16,25 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddControllers();
 builder.Services.AddHttpRequestService();
+
+builder.Services.AddMassTransit(x =>
+{
+    // Регистрируем consumers
+    x.AddConsumer<ReserveProductCommandConsumer>();
+    x.AddConsumer<CreateOrderCommandConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+        //TODO env
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 var app = builder.Build();
 app.MapControllers();

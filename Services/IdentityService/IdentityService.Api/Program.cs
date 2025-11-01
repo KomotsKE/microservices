@@ -8,6 +8,8 @@ using IdentityService.Logic.Services;
 using IdentityService.Dal.Interfaces;
 using IdentityService.Dal.Repositories;
 using IdentityService.Logic.Config;
+using IdentityService.Api.Consumers;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -68,6 +70,25 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddControllers();
+
+builder.Services.AddMassTransit(x =>
+{
+    // Регистрируем consumers
+    x.AddConsumer<ValidateUserCommandConsumer>();
+    x.AddConsumer<OrderStatusChangedEventConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
+//TODO env
 
 var app = builder.Build();
 
