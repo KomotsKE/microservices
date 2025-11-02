@@ -28,12 +28,12 @@ public class OrderService: IOrderService
         var userExists = await _identityService.CheckUserExistsAsync(checkUserDto);
         if (!userExists.IsExist)
             throw new Exception("User not found");
-            
+
         var product = await _productRepo.GetByIdAsync(productId);
         if (product == null) throw new Exception("Product not found");
         if (product.Stock < quantity) throw new Exception("Not enough stock");
 
-        product.Stock -= quantity;
+        product.Reserve(quantity);
         await _productRepo.UpdateAsync(product);
 
         var order = new Order
@@ -48,6 +48,23 @@ public class OrderService: IOrderService
         };
         await _orderRepo.AddAsync(order);
 
+        return MapToDto(order);
+    }
+
+    public async Task<OrderDto> CreateOrderFromSagaAsync(Guid userId, Guid productId, int quantity, decimal totalPrice)
+    {
+        var order = new Order
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            ProductId = productId,
+            Quantity = quantity,
+            TotalPrice = totalPrice,
+            Status = OrderStatus.Created,
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        await _orderRepo.AddAsync(order);
         return MapToDto(order);
     }
 

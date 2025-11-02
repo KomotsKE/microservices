@@ -16,6 +16,7 @@ public class CreateOrderSaga : MassTransitStateMachine<CreateOrderSagaState>
     public Event<UserValidatedEvent> UserValidated { get; private set; } = null!;
     public Event<ProductReservedEvent> ProductReserved { get; private set; } = null!;
     public Event<OrderCreatedEvent> OrderCreated { get; private set; } = null!;
+    public Event<OrderFailedEvent> OrderFailed { get; private set; } = null!;
 
     public CreateOrderSaga()
     {
@@ -25,20 +26,23 @@ public class CreateOrderSaga : MassTransitStateMachine<CreateOrderSagaState>
         Event(() => UserValidated, x => x.CorrelateById(context => context.Message.CorrelationId));
         Event(() => ProductReserved, x => x.CorrelateById(context => context.Message.CorrelationId));
         Event(() => OrderCreated, x => x.CorrelateById(context => context.Message.CorrelationId));
+        Event(() => OrderFailed, x => x.CorrelateById(context => context.Message.CorrelationId));
 
         Initially(
             When(OrderRequested)
                 .Then(context =>
                 {
+                    context.Saga.CorrelationId = context.Message.CorrelationId;
                     context.Saga.UserId = context.Message.UserId;
                     context.Saga.ProductId = context.Message.ProductId;
                     context.Saga.Quantity = context.Message.Quantity;
-                    //log
+                    context.Saga.CreatedAt = DateTime.UtcNow;
+                    context.Saga.UpdatedAt = DateTime.UtcNow;
                 })
                 .Send(context => new ValidateUserCommand
                 {
                     CorrelationId = context.Saga.CorrelationId,
-                    UserId = context.Message.UserId
+                    UserId = context.Saga.UserId
                 })
                 .TransitionTo(ValidatingUser)
         );
@@ -46,32 +50,22 @@ public class CreateOrderSaga : MassTransitStateMachine<CreateOrderSagaState>
         During(ValidatingUser,
             When(UserValidated)
                 .IfElse(context => context.Message.IsValid,
-                    valid => valid
-                        .Then(context =>
+                    binder => binder
+                        .Then(ctx => ctx.Saga.UpdatedAt = DateTime.UtcNow)
+                        .Send(ctx => new ReserveProductCommand
                         {
-                            context.Saga.UserValidated = true;
-                            //log
-                        })
-                        .Send(context => new ReserveProductCommand
-                        {
-                            CorrelationId = context.Saga.CorrelationId,
-                            ProductId = context.Saga.ProductId,
-                            Quantity = context.Saga.Quantity
+                            CorrelationId = ctx.Saga.CorrelationId,
+                            ProductId = ctx.Saga.ProductId,
+                            Quantity = ctx.Saga.Quantity
                         })
                         .TransitionTo(ReservingProduct),
-                    invalid => invalid
-                        .Then(context =>
+                    binder => binder
+                        .Publish(ctx => new OrderFailedEvent
                         {
-                            context.Saga.ErrorMessage = context.Message.ErrorMessage;
-                            //log
+                            CorrelationId = ctx.Saga.CorrelationId,
+                            FailedStep = "UserValidation",
+                            ErrorMessage = ctx.Message.ErrorMessage ?? "User not valid"
                         })
-                        .PublishAsync(context => context.Init<OrderFailedEvent>(new
-                        {
-                            context.Saga.CorrelationId,
-                            Reason = context.Message.ErrorMessage ?? "User validation failed",
-                            FailedStep = "UserValidation"
-                        }))
-                        .TransitionTo(Failed)
                         .Finalize()
                 )
         );
@@ -79,50 +73,64 @@ public class CreateOrderSaga : MassTransitStateMachine<CreateOrderSagaState>
         During(ReservingProduct,
             When(ProductReserved)
                 .IfElse(context => context.Message.IsReserved,
-                    reserved => reserved
-                        .Then(context =>
+                    binder => binder
+                        .Then(ctx => {
+                            ctx.Saga.UpdatedAt = DateTime.UtcNow;
+                            ctx.Saga.TotalPrice = ctx.Message.Price * ctx.Saga.Quantity;
+                            })
+                        .Send(ctx => new CreateOrderCommand
                         {
-                            context.Saga.ProductReserved = true;
-                            context.Saga.TotalPrice = context.Message.Price * context.Saga.Quantity;
-                            //log
-                        })
-                        .Send(context => new CoreLib.Messages.Commands.CreateOrderCommand
-                        {
-                            CorrelationId = context.Saga.CorrelationId,
-                            UserId = context.Saga.UserId,
-                            ProductId = context.Saga.ProductId,
-                            Quantity = context.Saga.Quantity,
-                            TotalPrice = context.Saga.TotalPrice
+                            CorrelationId = ctx.Saga.CorrelationId,
+                            UserId = ctx.Saga.UserId,
+                            ProductId = ctx.Saga.ProductId,
+                            Quantity = ctx.Saga.Quantity,
+                            TotalPrice = ctx.Message.Price * ctx.Saga.Quantity
                         })
                         .TransitionTo(CreatingOrder),
-                    notReserved => notReserved
-                        .Then(context =>
+                    binder => binder
+                        .Send(ctx => new ReleaseProductCommand { CorrelationId = ctx.Saga.CorrelationId })
+                        .Publish(ctx => new OrderFailedEvent
                         {
-                            context.Saga.ErrorMessage = context.Message.ErrorMessage;
-                            //log
+                            CorrelationId = ctx.Saga.CorrelationId,
+                            FailedStep = "ReserveProduct",
+                            ErrorMessage = ctx.Message.ErrorMessage ?? "Cannot reserve product"
                         })
-                        .PublishAsync(context => context.Init<OrderFailedEvent>(new
-                        {
-                            context.Saga.CorrelationId,
-                            Reason = context.Message.ErrorMessage ?? "Product reservation failed",
-                            FailedStep = "ProductReservation"
-                        }))
                         .TransitionTo(Failed)
-                        .Finalize()
                 )
         );
 
         During(CreatingOrder,
             When(OrderCreated)
-                .Then(context =>
+                .Then(ctx =>
                 {
-                    context.Saga.OrderId = context.Message.OrderId;
-                    //log
+                    ctx.Saga.OrderId = ctx.Message.OrderId;
+                    ctx.Saga.UpdatedAt = DateTime.UtcNow;
                 })
-                .TransitionTo(Completed)
+                .Publish(ctx => new OrderCreatedEvent
+                {
+                    CorrelationId = ctx.Saga.CorrelationId,
+                    OrderId = ctx.Saga.OrderId,
+                    UserId = ctx.Saga.UserId,
+                    ProductId = ctx.Saga.ProductId,
+                    Quantity = ctx.Saga.Quantity,
+                    TotalPrice = ctx.Saga.TotalPrice,
+                    CreatedAt = DateTime.UtcNow,
+                    Status = ctx.Message.Status
+                })
+                .Finalize(),
+
+            When(OrderFailed)
+                .Then(ctx => ctx.Saga.UpdatedAt = DateTime.UtcNow)
+                .Send(ctx => new ReleaseProductCommand { CorrelationId = ctx.Saga.CorrelationId })
+                .Publish(ctx => new OrderFailedEvent
+                {
+                    CorrelationId = ctx.Saga.CorrelationId,
+                    FailedStep = ctx.Message.FailedStep,
+                    ErrorMessage = ctx.Message.ErrorMessage
+                })
                 .Finalize()
         );
-
+        
         SetCompletedWhenFinalized();
     }
 }

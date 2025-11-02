@@ -8,4 +8,5 @@ public interface IOrderService
     Task<IEnumerable<OrderDto>> GetOrdersByUserIdAsync(Guid userId);
     Task<IEnumerable<OrderDto>> GetOrdersByStatusAsync(OrderStatusDto orderStatusDto);
     Task UpdateOrderStatusAsync(Guid orderId, OrderStatusDto newStatus);
+    Task<OrderDto> CreateOrderFromSagaAsync(Guid userId, Guid productId, int quantity, decimal totalPrice);
 }

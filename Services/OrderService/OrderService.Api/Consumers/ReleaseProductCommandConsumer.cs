@@ -5,41 +5,36 @@ using OrderService.Application.Interfaces;
 
 namespace OrderService.Api.Consumers;
 
-/// <summary>
-/// Orchestrator: Резервирует товар на складе
-/// </summary>
-public class ReserveProductCommandConsumer : IConsumer<ReserveProductCommand>
+public class ReleaseProductCommandConsumer : IConsumer<ReleaseProductCommand>
 {
     private readonly IProductService _productService;
-    public ReserveProductCommandConsumer(IProductService productService)
+    public ReleaseProductCommandConsumer(IProductService productService)
     {
         _productService = productService;
     }
-
-    public async Task Consume(ConsumeContext<ReserveProductCommand> context)
+    
+    public async Task Consume(ConsumeContext<ReleaseProductCommand> context)
     {
         try
         {
-            var product = await _productService.ReserveProductAsync(context.Message.ProductId, context.Message.Quantity);
+            var product = await _productService.ReleaseProductAsync(context.Message.ProductId, context.Message.Quantity);
 
-            await context.Publish(new ProductReservedEvent
+            await context.Publish(new ProductReleasedEvent
             {
                 CorrelationId = context.Message.CorrelationId,
                 ProductId = context.Message.ProductId,
                 Quantity = context.Message.Quantity,
-                IsReserved = true,
-                Price = product.Price,
+                IsReleased = true,
             });
         }
         catch (Exception ex)
         {
-            await context.Publish(new ProductReservedEvent
+            await context.Publish(new ProductReleasedEvent
             {
                 CorrelationId = context.Message.CorrelationId,
                 ProductId = context.Message.ProductId,
                 Quantity = context.Message.Quantity,
-                IsReserved = false,
-                Price = 0,
+                IsReleased = false,
                 ErrorMessage = ex.Message
             });
         }

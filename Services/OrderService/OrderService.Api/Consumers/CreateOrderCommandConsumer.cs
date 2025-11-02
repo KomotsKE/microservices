@@ -1,6 +1,7 @@
 using CoreLib.Messages.Commands;
 using CoreLib.Messages.Events;
 using MassTransit;
+using OrderService.Application.Interfaces;
 using OrderService.Domain.Entities;
 using OrderService.Domain.Enums;
 using OrderService.Domain.Interfaces;
@@ -10,44 +11,24 @@ namespace OrderService.Api.Consumers;
 /// <summary>
 /// Orchestrator: Создаёт заказ в базе данных
 /// </summary>
-public class CreateOrderCommandConsumer : IConsumer<CoreLib.Messages.Commands.CreateOrderCommand>
+public class CreateOrderCommandConsumer : IConsumer<CreateOrderCommand>
 {
-    private readonly IOrderRepository _orderRepository;
-    // private readonly ILogger<CreateOrderCommandConsumer> _logger;
+    private readonly IOrderService _orderService;
 
     public CreateOrderCommandConsumer(
-        IOrderRepository orderRepository)
+        IOrderService orderService)
     {
-        _orderRepository = orderRepository;
-        // _logger = logger;
+        _orderService = orderService;
     }
 
-    public async Task Consume(ConsumeContext<CoreLib.Messages.Commands.CreateOrderCommand> context)
+    public async Task Consume(ConsumeContext<CreateOrderCommand> context)
     {
-        // _logger.LogInformation(
-        //     "[ORDER] Creating order: UserId={UserId}, ProductId={ProductId}, Quantity={Quantity}",
-        //     context.Message.UserId,
-        //     context.Message.ProductId,
-        //     context.Message.Quantity
-        // );
-
         try
         {
-            var order = new Order
-            {
-                Id = Guid.NewGuid(),
-                UserId = context.Message.UserId,
-                ProductId = context.Message.ProductId,
-                Quantity = context.Message.Quantity,
-                TotalPrice = context.Message.TotalPrice,
-                Status = OrderStatus.Created,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _orderRepository.AddAsync(order);
-
-            // _logger.LogInformation("[ORDER] Order created successfully: {OrderId}", order.Id);
-
+            var order = await _orderService.CreateOrderFromSagaAsync(
+                context.Message.UserId, context.Message.ProductId,
+                context.Message.Quantity, context.Message.TotalPrice
+            );
             await context.Publish(new OrderCreatedEvent
             {
                 CorrelationId = context.Message.CorrelationId,
@@ -61,12 +42,10 @@ public class CreateOrderCommandConsumer : IConsumer<CoreLib.Messages.Commands.Cr
         }
         catch (Exception ex)
         {
-            // _logger.LogError(ex, "[ORDER] Error creating order");
-
             await context.Publish(new OrderFailedEvent
             {
                 CorrelationId = context.Message.CorrelationId,
-                Reason = $"Failed to create order: {ex.Message}",
+                ErrorMessage = ex.Message,
                 FailedStep = "OrderCreation"
             });
         }

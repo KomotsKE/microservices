@@ -9,4 +9,5 @@ public record OrderCreatedEvent
     public int Quantity { get; init; }
     public decimal TotalPrice { get; init; }
     public DateTime CreatedAt { get; init; }
+    public string Status { get; set; } = "Created";
 }

@@ -37,6 +37,24 @@ public class ProductService : IProductService
         return products.Select(p => MapToDto(p));
     }
 
+    public async Task<ProductDto> ReleaseProductAsync(Guid productId, int quantity)
+    {
+        var product = await _productRepo.GetByIdAsync(productId)
+            ?? throw new Exception($"Product {productId} not found");
+        product.Release(quantity);
+        await _productRepo.UpdateAsync(product);
+        return MapToDto(product);
+    }
+
+    public async Task<ProductDto> ReserveProductAsync(Guid productId, int quantity)
+    {
+        var product = await _productRepo.GetByIdAsync(productId) 
+            ?? throw new Exception($"Product {productId} not found");
+        product.Reserve(quantity);
+        await _productRepo.UpdateAsync(product);
+        return MapToDto(product);
+    }
+
     private ProductDto MapToDto(Product product)
     {
         return new ProductDto(product.Id, product.Name, product.Description, product.Price, product.Stock, product.CategoryId);
