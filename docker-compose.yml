@@ -1,0 +1,80 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app123
+      POSTGRES_DB: main
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - appnet
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - appnet
+
+  saga-orchestrator:
+    build:
+      context: .
+      dockerfile: Services/SagaOrchestrator/Dockerfile
+    container_name: saga-orchestrator
+    depends_on:
+      - rabbitmq
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - appnet
+
+  order-service:
+    build:
+      context: .
+      dockerfile: Services/OrderService/Dockerfile
+    container_name: order-service
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=orders
+      - DB_USER=app
+      - DB_PASSWORD=app123
+    networks:
+      - appnet
+
+  identity-service:
+    build:
+      context: .
+      dockerfile: Services/IdentityService/Dockerfile
+    container_name: identity-service
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=identity
+      - DB_USER=app
+      - DB_PASSWORD=app123
+    networks:
+      - appnet
+
+volumes:
+  pgdata:
+
+networks:
+  appnet:
+    driver: bridge

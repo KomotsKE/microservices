@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+# копируем csproj и восстанавливаем зависимости
+COPY Services/OrderService/OrderService.Api/OrderService.Api.csproj ./Services/OrderService/OrderService.Api/
+COPY Services/OrderService/OrderService.Application/OrderService.Application.csproj ./Services/OrderService/OrderService.Application/
+COPY Services/OrderService/OrderService.Domain/OrderService.Domain.csproj ./Services/OrderService/OrderService.Domain/
+COPY Services/OrderService/OrderService.Infrastructure/OrderService.Infrastructure.csproj ./Services/OrderService/OrderService.Infrastructure/
+COPY Libs/CoreLib/CoreLib.csproj ./Libs/CoreLib/
+RUN dotnet restore ./Services/OrderService/OrderService.Api/OrderService.Api.csproj
+
+COPY . .
+RUN dotnet publish ./Services/OrderService/OrderService.Api/OrderService.Api.csproj -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "OrderService.Api.dll"]

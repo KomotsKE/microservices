@@ -20,4 +20,7 @@ namespace IdentityService.Logic.Interfaces;
 
         /// <summary>Обновить роли пользователя, заменив старые на указанные.</summary>
         Task UpdateUserRoleAsync(Guid userId, IEnumerable<Guid> roleIds);
+
+        Task<bool> UserHasRoleAsync(Guid userId, string roleName);
+        
     }

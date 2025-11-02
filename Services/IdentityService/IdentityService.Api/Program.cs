@@ -76,6 +76,7 @@ builder.Services.AddMassTransit(x =>
     // Регистрируем consumers
     x.AddConsumer<ValidateUserCommandConsumer>();
     x.AddConsumer<OrderStatusChangedEventConsumer>();
+    x.AddConsumer<CheckUserPermissionConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {

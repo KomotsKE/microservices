@@ -38,6 +38,12 @@ public class UserRoleService : IUserRoleService
         });
     }
 
+    public async Task<bool> UserHasRoleAsync(Guid userId, string roleName)
+    {
+        var roles = await GetUserRolesNamesAsync(userId);
+        return roles.Contains(roleName, StringComparer.OrdinalIgnoreCase);
+    }
+
     public async Task<List<string>> GetUserRolesNamesAsync(Guid userId) => [.. (await GetUserRolesAsync(userId)).Select(r => r.Name)];
 
     public async Task RemoveRoleFromUserAsync(Guid roleId, Guid userId)

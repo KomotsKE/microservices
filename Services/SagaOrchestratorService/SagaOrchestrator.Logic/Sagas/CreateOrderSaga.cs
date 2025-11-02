@@ -95,7 +95,7 @@ public class CreateOrderSaga : MassTransitStateMachine<CreateOrderSagaState>
                             FailedStep = "ReserveProduct",
                             ErrorMessage = ctx.Message.ErrorMessage ?? "Cannot reserve product"
                         })
-                        .TransitionTo(Failed)
+                        .Finalize()
                 )
         );
 
@@ -105,28 +105,6 @@ public class CreateOrderSaga : MassTransitStateMachine<CreateOrderSagaState>
                 {
                     ctx.Saga.OrderId = ctx.Message.OrderId;
                     ctx.Saga.UpdatedAt = DateTime.UtcNow;
-                })
-                .Publish(ctx => new OrderCreatedEvent
-                {
-                    CorrelationId = ctx.Saga.CorrelationId,
-                    OrderId = ctx.Saga.OrderId,
-                    UserId = ctx.Saga.UserId,
-                    ProductId = ctx.Saga.ProductId,
-                    Quantity = ctx.Saga.Quantity,
-                    TotalPrice = ctx.Saga.TotalPrice,
-                    CreatedAt = DateTime.UtcNow,
-                    Status = ctx.Message.Status
-                })
-                .Finalize(),
-
-            When(OrderFailed)
-                .Then(ctx => ctx.Saga.UpdatedAt = DateTime.UtcNow)
-                .Send(ctx => new ReleaseProductCommand { CorrelationId = ctx.Saga.CorrelationId })
-                .Publish(ctx => new OrderFailedEvent
-                {
-                    CorrelationId = ctx.Saga.CorrelationId,
-                    FailedStep = ctx.Message.FailedStep,
-                    ErrorMessage = ctx.Message.ErrorMessage
                 })
                 .Finalize()
         );

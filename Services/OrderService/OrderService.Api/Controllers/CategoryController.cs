@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using OrderService.Application.DTOs;
 using OrderService.Application.Interfaces;
 
-namespace Marketplace.API.Controllers
+namespace OrderService.API.Controllers
 {
     [ApiController]
     [Route("orderservice/api/[controller]")]
