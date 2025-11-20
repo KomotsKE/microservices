@@ -5,6 +5,7 @@ using OrderService.Infrastructure;
 using CoreLib.HttpLogic;
 using OrderService.Api.Consumers;
 using MassTransit;
+using OrderService.API.Sagas;
 
 
 Env.Load();
@@ -33,6 +34,27 @@ builder.Services.AddMassTransit(x =>
         //TODO env
 
         cfg.ConfigureEndpoints(context);
+    });
+});
+
+builder.Services.AddMassTransit(x =>
+{
+    // Регистрируем сагу
+    x.AddSagaStateMachine<OrderUpdateSaga, OrderUpdateSagaState>()
+        .InMemoryRepository(); // или EFCoreRepository
+
+    // Регистрируем consumers, если есть отдельные
+    x.AddConsumersFromNamespaceContaining<OrderUpdateSaga>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("rabbitmq://localhost", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        cfg.ConfigureEndpoints(context); // создаёт очереди под Saga и consumers
     });
 });
 
