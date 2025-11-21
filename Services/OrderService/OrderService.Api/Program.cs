@@ -6,6 +6,9 @@ using CoreLib.HttpLogic;
 using OrderService.Api.Consumers;
 using MassTransit;
 using OrderService.API.Sagas;
+using StackExchange.Redis;
+using Corelib.Distributed.interfaces;
+using Corelib.Distributed.RedisDistrubutedSemaphore;
 
 
 Env.Load();
@@ -56,6 +59,19 @@ builder.Services.AddMassTransit(x =>
 
         cfg.ConfigureEndpoints(context); // создаёт очереди под Saga и consumers
     });
+});
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect("localhost:6379"));
+
+builder.Services.AddSingleton<IDistributedSemaphore>(sp =>
+{
+    var mux = sp.GetRequiredService<IConnectionMultiplexer>();
+    return new RedisDistributedSemaphore(
+        mux,
+        name: "process-x",
+        maxCount: 1,
+        expiry: TimeSpan.FromSeconds(30));
 });
 
 var app = builder.Build();
