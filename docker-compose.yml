@@ -24,10 +24,19 @@ services:
     networks:
       - appnet
 
+  redis:
+    image: redis:7
+    container_name: redis
+    command: ["redis-server", "--notify-keyspace-events", "Ex"]
+    ports:
+      - "6379:6379"
+    networks:
+      - appnet
+
   saga-orchestrator:
     build:
       context: .
-      dockerfile: Services/SagaOrchestrator/Dockerfile
+      dockerfile: Services/SagaOrchestratorService/dockerfile
     container_name: saga-orchestrator
     depends_on:
       - rabbitmq
@@ -39,11 +48,12 @@ services:
   order-service:
     build:
       context: .
-      dockerfile: Services/OrderService/Dockerfile
+      dockerfile: Services/OrderService/dockerfile
     container_name: order-service
     depends_on:
       - postgres
       - rabbitmq
+      - redis
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - DB_HOST=postgres
@@ -51,17 +61,20 @@ services:
       - DB_NAME=orders
       - DB_USER=app
       - DB_PASSWORD=app123
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     networks:
       - appnet
 
   identity-service:
     build:
       context: .
-      dockerfile: Services/IdentityService/Dockerfile
+      dockerfile: Services/IdentityService/dockerfile
     container_name: identity-service
     depends_on:
       - postgres
       - rabbitmq
+      - redis
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - DB_HOST=postgres
@@ -69,6 +82,8 @@ services:
       - DB_NAME=identity
       - DB_USER=app
       - DB_PASSWORD=app123
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     networks:
       - appnet
 
