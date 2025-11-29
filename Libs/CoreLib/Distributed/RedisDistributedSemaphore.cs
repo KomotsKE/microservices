@@ -1,10 +1,12 @@
+using System;
 using System.Diagnostics;
-// using StackExchange.Redis;
+using System.Threading;
+using System.Threading.Tasks;
 using Corelib.Distributed.interfaces;
-using Corelib.Distributed.RedisDistrubutedSemaphoreHandle;
+using Corelib.Distributed.RedisDistributedSemaphoreHandle;
 using StackExchange.Redis;
 
-namespace Corelib.Distributed.RedisDistrubutedSemaphore;
+namespace Corelib.Distributed.RedisDistributedSemaphore;
 /// <inheritdoc />
 public sealed class RedisDistributedSemaphore : IDistributedSemaphore
 {
@@ -50,8 +52,8 @@ public sealed class RedisDistributedSemaphore : IDistributedSemaphore
         _expiry = expiry ?? TimeSpan.FromSeconds(30);
     }
 
-    public IDistributedSynchronizationHandle? TryAcquire(TimeSpan timeout = default,CancellationToken cancellationToken = default)
-        => TryAcquireAsync(timeout, cancellationToken).Result;
+    public IDistributedSynchronizationHandle? TryAcquire(TimeSpan timeout = default, CancellationToken cancellationToken = default)
+        => TryAcquireAsync(timeout, cancellationToken).GetAwaiter().GetResult();
 
     public IDistributedSynchronizationHandle Acquire(TimeSpan? timeout = null, CancellationToken cancellationToken = default)
     {
@@ -69,19 +71,26 @@ public sealed class RedisDistributedSemaphore : IDistributedSemaphore
             var lockId = $"{Environment.MachineName}:{Guid.NewGuid()}";
             var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-            var result = (int?)await _db.ScriptEvaluateAsync(
+            var res = await _db.ScriptEvaluateAsync(
                 AcquireScript,
-                [_key],
-                [
-                    lockId,
-                    _maxCount,
-                    now,
-                    (int)_expiry.TotalSeconds
-                ]);
+                new RedisKey[] { _key },
+                new RedisValue[] { lockId, _maxCount, now, (int)_expiry.TotalSeconds });
+
+            int result = 0;
+            try
+            {
+                if (!res.IsNull)
+                    result = Convert.ToInt32((long)res);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"RedisDistributedSemaphore: failed to parse script result: {ex}");
+            }
 
             if (result == 1)
             {
-                var handle = new RedisDistributedSemaphoreHandle(
+                var handle = new 
+                RedisDistributedSemaphoreHandle.RedisDistributedSemaphoreHandle(
                     _mux,
                     _db,
                     _key,

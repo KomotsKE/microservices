@@ -8,7 +8,7 @@ using MassTransit;
 using OrderService.API.Sagas;
 using StackExchange.Redis;
 using Corelib.Distributed.interfaces;
-using Corelib.Distributed.RedisDistrubutedSemaphore;
+using Corelib.Distributed.RedisDistributedSemaphore;
 
 
 Env.Load();
@@ -62,7 +62,12 @@ builder.Services.AddMassTransit(x =>
 });
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-    ConnectionMultiplexer.Connect("localhost:6379"));
+{
+    var redisHost = Environment.GetEnvironmentVariable("REDIS_HOST") ?? "localhost";
+    var redisPort = Environment.GetEnvironmentVariable("REDIS_PORT") ?? "6379";
+    var conn = $"{redisHost}:{redisPort}";
+    return ConnectionMultiplexer.Connect(conn);
+});
 
 builder.Services.AddSingleton<IDistributedSemaphore>(sp =>
 {

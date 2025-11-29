@@ -1,10 +1,14 @@
+using System;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using Corelib.Distributed.interfaces;
 using StackExchange.Redis;
 
-namespace Corelib.Distributed.RedisDistrubutedSemaphoreHandle;
+namespace Corelib.Distributed.RedisDistributedSemaphoreHandle;
 
 /// <summary>
-/// Дескриптор распределённой блокировки.
+/// Дескриптор распределённой блокировки.б
 /// Хранит состояние lock'a и следит за его жизнью.
 /// </summary>
 public sealed class RedisDistributedSemaphoreHandle :
@@ -21,6 +25,7 @@ public sealed class RedisDistributedSemaphoreHandle :
 
     private Task? _heartbeatTask;
     private ISubscriber? _subscriber;
+    private RedisChannel _channel;
     private bool _disposed;
 
     public CancellationToken HandleLostToken => _lostCts.Token;
@@ -64,16 +69,19 @@ public sealed class RedisDistributedSemaphoreHandle :
         {
             _subscriber = _mux.GetSubscriber();
             var dbIndex = _db.Database;
-            var channel = RedisChannel.Literal($"__keyspace@{dbIndex}__:{_key}");
+            _channel = RedisChannel.Literal($"__keyspace@{dbIndex}__:{_key}");
 
-            _subscriber.Subscribe(channel, (_, msg) =>
+            _subscriber.Subscribe(_channel, (_, msg) =>
             {
                 var evt = msg.ToString();
                 if (evt == "expired" || evt == "del")
                     MarkLost();
             });
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"RedisDistributedSemaphoreHandle.Subscribe failed: {ex}");
+        }
     }
 
     private async Task HeartbeatLoop()
@@ -122,12 +130,25 @@ public sealed class RedisDistributedSemaphoreHandle :
         {
             await _db.ScriptEvaluateAsync(
                 ReleaseScript,
-                [_key],
-                [_lockId, (int)_expiry.TotalSeconds]);
+                new RedisKey[] { _key },
+                new RedisValue[] { _lockId, (int)_expiry.TotalSeconds });
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"RedisDistributedSemaphoreHandle.DisposeAsync: release script failed: {ex}");
+        }
 
-        try { _subscriber?.UnsubscribeAll(); } catch {}
+        try
+        {
+            if (_subscriber != null)
+            {
+                _subscriber.Unsubscribe(_channel);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"RedisDistributedSemaphoreHandle.DisposeAsync: unsubscribe failed: {ex}");
+        }
 
         _mux.ConnectionFailed -= OnConnectionFailed;
 
