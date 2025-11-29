@@ -1,13 +1,13 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY Services/SagaOrchestrator/SagaOrchestrator.Api/SagaOrchestrator.Api.csproj ./Services/SagaOrchestrator/SagaOrchestrator.Api/
-COPY Services/SagaOrchestrator/SagaOrchestrator.Logic/SagaOrchestrator.Logic.csproj ./Services/SagaOrchestrator/SagaOrchestrator.Logic/
-COPY Libs/CoreLib/CoreLib.csproj ./Libs/CoreLib/
-RUN dotnet restore ./Services/SagaOrchestrator/SagaOrchestrator.Api/SagaOrchestrator.Api.csproj
+COPY Services/SagaOrchestratorService/SagaOrchestrator.Api/SagaOrchestrator.Api.csproj ./Services/SagaOrchestratorService/SagaOrchestrator.Api/
+COPY Services/SagaOrchestratorService/SagaOrchestrator.Logic/SagaOrchestrator.Logic.csproj ./Services/SagaOrchestratorService/SagaOrchestrator.Logic/
+COPY Libs/CoreLib/CoreLib.csproj ./libs/CoreLib/
+RUN dotnet restore ./Services/SagaOrchestratorService/SagaOrchestrator.Api/SagaOrchestrator.Api.csproj
 
 COPY . .
-RUN dotnet publish ./Services/SagaOrchestrator/SagaOrchestrator.Api/SagaOrchestrator.Api.csproj -c Release -o /app/publish
+RUN dotnet publish ./Services/SagaOrchestratorService/SagaOrchestrator.Api/SagaOrchestrator.Api.csproj -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app

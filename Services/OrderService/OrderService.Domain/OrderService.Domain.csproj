@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="../../../libs/CoreLib/CoreLib.csproj" />
-    <ProjectReference Include="../../../libs/IdentityConnectionLib/IdentityConnectionLib.csproj" />
+    <ProjectReference Include="../../../Libs/CoreLib/CoreLib.csproj" />
+    <ProjectReference Include="../../../Libs/IdentityConnectionLib/identityConnectionLib.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

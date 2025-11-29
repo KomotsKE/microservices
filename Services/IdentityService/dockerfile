@@ -2,10 +2,9 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 COPY Services/IdentityService/IdentityService.Api/IdentityService.Api.csproj ./Services/IdentityService/IdentityService.Api/
-COPY Services/IdentityService/IdentityService.Application/IdentityService.Application.csproj ./Services/IdentityService/IdentityService.Application/
-COPY Services/IdentityService/IdentityService.Domain/IdentityService.Domain.csproj ./Services/IdentityService/IdentityService.Domain/
-COPY Services/IdentityService/IdentityService.Infrastructure/IdentityService.Infrastructure.csproj ./Services/IdentityService/IdentityService.Infrastructure/
-COPY Libs/CoreLib/CoreLib.csproj ./Libs/CoreLib/
+COPY Services/IdentityService/IdentityService.Logic/IdentityService.Logic.csproj ./Services/IdentityService/IdentityService.Logic/
+COPY Services/IdentityService/IdentityService.Dal/IdentityService.Dal.csproj ./Services/IdentityService/IdentityService.Dal/
+COPY Libs/CoreLib/CoreLib.csproj ./libs/CoreLib/
 RUN dotnet restore ./Services/IdentityService/IdentityService.Api/IdentityService.Api.csproj
 
 COPY . .

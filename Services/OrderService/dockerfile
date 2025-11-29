@@ -1,12 +1,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# копируем csproj и восстанавливаем зависимости
 COPY Services/OrderService/OrderService.Api/OrderService.Api.csproj ./Services/OrderService/OrderService.Api/
 COPY Services/OrderService/OrderService.Application/OrderService.Application.csproj ./Services/OrderService/OrderService.Application/
 COPY Services/OrderService/OrderService.Domain/OrderService.Domain.csproj ./Services/OrderService/OrderService.Domain/
 COPY Services/OrderService/OrderService.Infrastructure/OrderService.Infrastructure.csproj ./Services/OrderService/OrderService.Infrastructure/
-COPY Libs/CoreLib/CoreLib.csproj ./Libs/CoreLib/
+COPY Services/OrderService/OrderService.Application/OrderService.Application.csproj ./Services/OrderService/Orderservice.application/
+COPY Services/OrderService/OrderService.Infrastructure/OrderService.Infrastructure.csproj ./Services/OrderService/orderservice.infrastructure/
+COPY Libs/CoreLib/CoreLib.csproj ./libs/CoreLib/
+COPY Libs/IdentityConnectionLib/identityConnectionLib.csproj ./libs/IdentityConnectionLib/
 RUN dotnet restore ./Services/OrderService/OrderService.Api/OrderService.Api.csproj
 
 COPY . .
